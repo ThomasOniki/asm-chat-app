@@ -1,10 +1,11 @@
 .section __TEXT,__text
 .globl _start
 _start:
-	mov w0, 2 ; AF_INET (ipv2)
-	mov w1, 1 ; SOCK_STREAM (tcp)
-	mov w2, 0 ; protocol
-	mov x16, 97 ; SYS_socket
+; socket(AF_INET, SOCK_STREAM, 0)
+	mov w0, 2
+	mov w1, 1
+	mov w2, 0
+	mov x16, 97
 	svc 0x80
 
 	mov w19, w0
@@ -13,23 +14,26 @@ _start:
 	movk x1, 1234, lsl 16 ; port
 	stp x1, xzr, [sp, -0x10]!
 
-	; x0 is already the sockfd
-	mov x1, sp ; sockaddr*
-	mov w2, 16 ; socklen
-	mov x16, 104 ; SYS_bind
+; bind(sockfd, &sockaddr, socklen)
+	mov x1, sp
+	mov w2, 16
+	mov x16, 104
 	svc 0x80
 
-	mov w0, w19 ; sockfd
-	mov w1, 10 ; backlog
-	mov x16, 106 ; SYS_listen
+; listen(sockfd, backlog)
+	mov w0, w19
+	mov w1, 10
+	mov x16, 106
 	svc 0x80
 
-	mov w0, w19 ; sockfd
-	mov x1, 0 ; name*
-	mov x2, 0 ; namelen*
-	mov x16, 30 ; SYS_accept
+; accept(sockfd, NULL, NULL)
+	mov w0, w19
+	mov x1, 0
+	mov x2, 0
+	mov x16, 30
 	svc 0x80
 
+; exit(0)
 	mov w0, 0 
-	mov x16, 1 ; SYS_exit
+	mov x16, 1
 	svc 0x80
