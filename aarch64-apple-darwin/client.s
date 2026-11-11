@@ -45,16 +45,16 @@ _start:
 	svc 0x80
 
 connect_err:
-mov w19, w0
-mov w0, 2
-adrp x1, connect_err_msg@page
-add x1, x1, connect_err_msg@pageoff
-mov x2, 54
-mov x16, 4
-svc 0x80
-mov w0, w19
-mov x16, 1
-svc 0x80
+	mov w19, w0
+	mov w0, 2
+	adrp x1, connect_err_msg@page
+	add x1, x1, connect_err_msg@pageoff
+	mov x2, 54
+	mov x16, 4
+	svc 0x80
+	mov w0, w19
+	mov x16, 1
+	svc 0x80
 
 .section __TEXT,__const
 connect_err_msg:
