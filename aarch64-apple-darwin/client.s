@@ -25,6 +25,20 @@ _start:
 
 	cbnz x0, connect_err
 
+	sub sp, sp, 0x100
+
+	mov w0, 0
+	mov x1, sp
+	mov x2, 0x100
+	mov x16, 3
+	svc 0x80
+
+	mov x1, sp
+	mov x2, x0
+	mov w0, w19
+	mov x16, 4
+	svc 0x80
+
 ; exit(0)
 	mov w0, 0
 	mov x16, 1
