@@ -35,9 +35,31 @@ _start:
 
 	mov w19, w0
 
-	sub sp, sp, 0x100
+	sub sp, sp, 0x110
+
+	add x0, sp, 0x100
+	mov w1, 1 ; POLLIN
+	stp w19, w1, [x0]
+	stp wzr, w1, [x0, 8]
 
 loop:
+; poll(fds, nfds, timeout)
+	add x0, sp, 0x100
+	mov w1, 2
+	mov w2, 0
+	mov x16, 230
+	svc 0x80
+
+	ldrh w0, [sp, 0x106]
+  cmp w0, 1
+	b.eq read_sock
+	ldrh w0, [sp, 0x10e]
+  cmp w0, 1
+	b.eq read_stdin
+
+	b loop
+
+read_sock:
 ; read(sockfd, sp, 0x100)
 	mov w0, w19
 	mov x1, sp
@@ -58,5 +80,29 @@ loop:
 
 ; exit(0)
 	mov w0, 0 
+	mov x16, 1
+	svc 0x80
+
+read_stdin:
+; read(0, sp, 0x100)
+	mov w0, 0
+	mov x1, sp
+	mov x2, 0x100
+	mov x16, 3
+	svc 0x80
+
+; write(sockfd, sp, bytes_read)
+	mov x1, sp
+	mov x2, x0
+	mov w0, w19
+	mov x16, 4
+	svc 0x80
+
+	ldrh w0, [sp]
+	cmp w0, 0x0a71 ; "q\n"
+	b.ne loop
+
+; exit(0)
+	mov w0, 0
 	mov x16, 1
 	svc 0x80
