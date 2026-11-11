@@ -35,10 +35,11 @@ _start:
 
 	mov w19, w0
 
+	sub sp, sp, 0x100
+
 loop:
 ; read(sockfd, sp, 0x100)
 	mov w0, w19
-	sub sp, sp, 0x100
 	mov x1, sp
 	mov x2, 0x100
 	mov x16, 3
