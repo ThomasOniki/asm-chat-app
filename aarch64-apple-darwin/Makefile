@@ -3,7 +3,7 @@
 build: client server
 
 clean:
-	rm -rf obj server
+	rm -rf obj client server
 
 rebuild: clean build
 
