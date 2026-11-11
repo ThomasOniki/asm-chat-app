@@ -13,7 +13,7 @@ client: obj/client.o
 	ld64.lld -s -platform_version macos 27.2 15.3 -arch arm64 -e _start -o client obj/client.o
 
 obj/client.o: obj client.s
-	clang -march=native -o obj/client.o -c client.s
+	as -o obj/client.o -c client.s
 
 server: obj/server.o
 	# MacOS ld doesn't support linking without libSystem, which is why lld is used.
