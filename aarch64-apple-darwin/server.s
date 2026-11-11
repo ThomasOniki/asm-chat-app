@@ -33,7 +33,11 @@ _start:
 	mov x16, 30
 	svc 0x80
 
+	mov w19, w0
+
+loop:
 ; read(sockfd, sp, 0x100)
+	mov w0, w19
 	sub sp, sp, 0x100
 	mov x1, sp
 	mov x2, 0x100
@@ -46,6 +50,10 @@ _start:
 	mov w0, 1
 	mov x16, 4
 	svc 0x80
+
+	ldrh w0, [sp]
+	cmp w0, 0x0a71 ; "q\n"
+	b.ne loop
 
 ; exit(0)
 	mov w0, 0 

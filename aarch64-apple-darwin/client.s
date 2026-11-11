@@ -27,6 +27,7 @@ _start:
 
 	sub sp, sp, 0x100
 
+loop:
 	mov w0, 0
 	mov x1, sp
 	mov x2, 0x100
@@ -38,6 +39,10 @@ _start:
 	mov w0, w19
 	mov x16, 4
 	svc 0x80
+
+	ldrh w0, [sp]
+	cmp w0, 0x0a71 ; "q\n"
+	b.ne loop
 
 ; exit(0)
 	mov w0, 0
