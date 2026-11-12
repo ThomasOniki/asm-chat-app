@@ -6,18 +6,18 @@ _start:
 	cmp x0, 3
 	b.ne usage
 
-; client:
+// client:
 
 	ldp x19, x20, [x1, 8]
 
-; socket(AF_INET, SOCK_STREAM, 0)
+// socket(AF_INET, SOCK_STREAM, 0)
 	mov w0, 2
 	mov w1, 1
 	mov w2, 0
 	mov x16, 97
 	svc 0x80
 
-; get ip to w1
+// get ip to w1
 	mov w1, 0
 	mov w2, 4
 	mov w3, 10
@@ -50,24 +50,24 @@ byte_end:
 	cmp w4, 256
 	b.hs usage
 
-; little endian stuff
+// little endian stuff
 	lsl w4, w4, 24
 	orr w1, w1, w4
 
 	sub w2, w2, 1
 	cbz w2, ip_end
 
-	cmp w5, -2 ; '.' - 0x30
+	cmp w5, -2 // '.' - 0x30
 	b.ne usage
 
 	lsr w1, w1, 8
 	b byte_start
 
 ip_end:
-	cmp w5, -0x30 ; '\0' - 0x30
+	cmp w5, -0x30 // '\0' - 0x30
 	b.ne usage
 
-; get port to w2
+// get port to w2
 	ldrb w5, [x20], 1
 	sub w5, w5, 0x30
 	cmp w5, 10
@@ -98,13 +98,13 @@ client_port_end:
 	b.hs usage
 
 	lsl w2, w2, 16
-	movk w2, 2 ; AF_INET
+	movk w2, 2 // AF_INET
 	stp w2, w1, [sp, -0x10]!
 	str xzr, [sp, 0x8]
 
 	mov w19, w0
 
-; connect(sockfd, &sockaddr, socklen)
+// connect(sockfd, &sockaddr, socklen)
 	mov x1, sp
 	mov w2, 16
 	mov x16, 98
@@ -116,14 +116,14 @@ client_port_end:
 
 server:
 	ldr x20, [x1, 8]
-; socket(AF_INET, SOCK_STREAM, 0)
+// socket(AF_INET, SOCK_STREAM, 0)
 	mov w0, 2
 	mov w1, 1
 	mov w2, 0
 	mov x16, 97
 	svc 0x80
 
-; get port to w2
+// get port to w2
 	ldrb w5, [x20], 1
 	sub w5, w5, 0x30
 	cmp w5, 10
@@ -157,23 +157,23 @@ server_port_end:
 	mov w19, w0
 
 	lsl x2, x2, 16
-	movk x2, 2 ; AF_INET
+	movk x2, 2 // AF_INET
 	stp x2, xzr, [sp, -0x10]!
 
-; bind(sockfd, &sockaddr, socklen)
+// bind(sockfd, &sockaddr, socklen)
 	mov x1, sp
 	mov w2, 16
 	mov x16, 104
 	svc 0x80
 	cbnz w0, bind_err
 
-; listen(sockfd, backlog)
+// listen(sockfd, backlog)
 	mov w0, w19
 	mov w1, 10
 	mov x16, 106
 	svc 0x80
 
-; accept(sockfd, NULL, NULL)
+// accept(sockfd, NULL, NULL)
 	mov w0, w19
 	mov x1, 0
 	mov x2, 0
@@ -186,12 +186,12 @@ poll_loop:
 	sub sp, sp, 0x110
 
 	add x0, sp, 0x100
-	mov w1, 1 ; POLLIN
+	mov w1, 1 // POLLIN
 	stp w19, w1, [x0]
 	stp wzr, w1, [x0, 8]
 
 continue_poll:
-; poll(fds, nfds, timeout)
+// poll(fds, nfds, timeout)
 	add x0, sp, 0x100
 	mov w1, 2
 	mov w2, 0
@@ -208,14 +208,14 @@ continue_poll:
 	b continue_poll
 
 read_sock:
-; read(sockfd, sp, 0x100)
+// read(sockfd, sp, 0x100)
 	mov w0, w19
 	mov x1, sp
 	mov x2, 0x100
 	mov x16, 3
 	svc 0x80
 
-; write(1, sp, bytes_read)
+// write(1, sp, bytes_read)
 	mov x1, sp
 	mov x2, x0
 	mov w0, 1
@@ -223,23 +223,23 @@ read_sock:
 	svc 0x80
 
 	ldrh w0, [sp]
-	cmp w0, 0x0a71 ; "q\n"
+	cmp w0, 0x0a71 // "q\n"
 	b.ne continue_poll
 
-; exit(0)
+// exit(0)
 	mov w0, 0 
 	mov x16, 1
 	svc 0x80
 
 read_stdin:
-; read(0, sp, 0x100)
+// read(0, sp, 0x100)
 	mov w0, 0
 	mov x1, sp
 	mov x2, 0x100
 	mov x16, 3
 	svc 0x80
 
-; write(sockfd, sp, bytes_read)
+// write(sockfd, sp, bytes_read)
 	mov x1, sp
 	mov x2, x0
 	mov w0, w19
@@ -247,10 +247,10 @@ read_stdin:
 	svc 0x80
 
 	ldrh w0, [sp]
-	cmp w0, 0x0a71 ; "q\n"
+	cmp w0, 0x0a71 // "q\n"
 	b.ne continue_poll
 
-; exit(0)
+// exit(0)
 	mov w0, 0
 	mov x16, 1
 	svc 0x80
