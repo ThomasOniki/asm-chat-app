@@ -165,6 +165,7 @@ server_port_end:
 	mov w2, 16
 	mov x16, 104
 	svc 0x80
+	cbnz w0, bind_err
 
 ; listen(sockfd, backlog)
 	mov w0, w19
@@ -267,6 +268,18 @@ connect_err:
 	mov x16, 1
 	svc 0x80
 
+bind_err:
+	mov w19, w0
+	mov w0, 2
+	adrp x1, bind_err_msg@page
+	add x1, x1, bind_err_msg@pageoff
+	mov x2, 51
+	mov x16, 4
+	svc 0x80
+	mov w0, w19
+	mov x16, 1
+	svc 0x80
+
 usage:
 	mov w0, 2
 	adrp x1, usage_msg@page
@@ -281,5 +294,7 @@ usage:
 .section __TEXT,__const
 connect_err_msg:
 	.ascii "connect(2) failed, its error number will be returned.\n"
+bind_err_msg:
+	.ascii "bind(2) failed, its error number will be returned.\n"
 usage_msg:
 	.ascii "host:\nasm-chat-app <port>\nguest:\nasm-chat-app <ip> <port>\n"
