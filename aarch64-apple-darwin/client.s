@@ -64,7 +64,7 @@ ip_end:
 	b.ne usage
 
 ; get port to w2
-	ldrb w5, [x19], 1
+	ldrb w5, [x20], 1
 	sub w5, w5, 0x30
 	cmp w5, 10
 	b.hs usage
@@ -73,7 +73,7 @@ ip_end:
 	mov w4, 4
 
 digit:
-	ldrb w5, [x19], 1
+	ldrb w5, [x20], 1
 	sub w5, w5, 0x30
 	cmp w5, 10
 	b.hs port_end
@@ -83,7 +83,7 @@ digit:
 	sub w4, w4, 1
 	cbnz w4, digit
 
-	ldrb w5, [x19], 1
+	ldrb w5, [x20], 1
 	sub w5, w5, 0x30
 
 port_end:
