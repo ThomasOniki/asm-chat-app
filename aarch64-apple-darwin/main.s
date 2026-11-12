@@ -1,14 +1,14 @@
 .section __TEXT,__text
 .globl _start
 _start:
-cmp x0, 2
-b.eq server
-cmp x0, 3
-b.ne usage
+	cmp x0, 2
+	b.eq server
+	cmp x0, 3
+	b.ne usage
 
 ; client:
 
-ldp x19, x20, [x1, 8]
+	ldp x19, x20, [x1, 8]
 
 ; socket(AF_INET, SOCK_STREAM, 0)
 	mov w0, 2
@@ -199,10 +199,10 @@ continue_poll:
 	svc 0x80
 
 	ldrh w0, [sp, 0x106]
-  cmp w0, 1
+	cmp w0, 1
 	b.eq read_sock
 	ldrh w0, [sp, 0x10e]
-  cmp w0, 1
+	cmp w0, 1
 	b.eq read_stdin
 
 	b continue_poll
