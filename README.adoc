@@ -1,0 +1,25 @@
+= asm-chat-app
+
+This project is a chat app entirely written in assembly with no dependencies (not even libc). It uses raw syscalls to create a TCP connection where it sends raw, encrypted data.
+
+== Build
+
+[source,sh]
+----
+cd <platform>
+make
+----
+
+== Usage
+
+host:
+[source,sh]
+----
+asm-chat-app <port>
+----
+
+guest:
+[source,sh]
+----
+asm-chat-app <ip> <port>
+----
