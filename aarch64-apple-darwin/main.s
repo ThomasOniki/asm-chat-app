@@ -257,6 +257,8 @@ read_stdin:
 
 
 connect_err:
+	cmp w0, 61
+	b.eq econrefused
 	mov w19, w0
 	mov w0, 2
 	adrp x1, connect_err_msg@page
@@ -268,7 +270,20 @@ connect_err:
 	mov x16, 1
 	svc 0x80
 
+econrefused:
+	mov w0, 2
+	adrp x1, econrefused_msg@page
+	add x1, x1, econrefused_msg@pageoff
+	mov x2, 91
+	mov x16, 4
+	svc 0x80
+	mov w0, 1
+	mov x16, 1
+	svc 0x80
+
 bind_err:
+	cmp w0, 48
+	b.eq eaddrinuse
 	mov w19, w0
 	mov w0, 2
 	adrp x1, bind_err_msg@page
@@ -277,6 +292,17 @@ bind_err:
 	mov x16, 4
 	svc 0x80
 	mov w0, w19
+	mov x16, 1
+	svc 0x80
+
+eaddrinuse:
+	mov w0, 2
+	adrp x1, eaddrinuse_msg@page
+	add x1, x1, eaddrinuse_msg@pageoff
+	mov x2, 85
+	mov x16, 4
+	svc 0x80
+	mov w0, 1
 	mov x16, 1
 	svc 0x80
 
@@ -294,7 +320,11 @@ usage:
 .section __TEXT,__const
 connect_err_msg:
 	.ascii "connect(2) failed, its error number will be returned.\n"
+econrefused_msg:
+	.ascii "connect(2) failed: ECONREFUSED. Check that a host is running at the specified ip and port.\n"
 bind_err_msg:
 	.ascii "bind(2) failed, its error number will be returned.\n"
+eaddrinuse_msg:
+	.ascii "bind(2) failed: EADDRINUSE. Check that no other process is using the specified port.\n"
 usage_msg:
 	.ascii "host:\nasm-chat-app <port>\nguest:\nasm-chat-app <ip> <port>\n"
