@@ -1,9 +1,9 @@
 .section __TEXT,__text
 .globl _start
 _start:
-	cmp x0, 2
+	cmp w0, 2
 	b.eq server
-	cmp x0, 3
+	cmp w0, 3
 	b.ne usage
 
 // client:

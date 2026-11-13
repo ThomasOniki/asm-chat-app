@@ -1,10 +1,10 @@
 .text
 .globl _start
 _start:
-	ldr x0, [sp]
-	cmp x0, 2
+	ldr w0, [sp]
+	cmp w0, 2
 	b.eq server
-	cmp x0, 3
+	cmp w0, 3
 	b.ne usage
 
 // client:
