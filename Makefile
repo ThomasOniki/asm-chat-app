@@ -9,7 +9,7 @@ platform = $(arch)-$(kernel)
 ifeq ($(kernel), darwin)
 lld_path = $(shell command -v ld64.lld)
 ifeq ($(lld_path),)
-nolld = 1
+$(warning "WARNING: If you don't want to link with libSystem, ensure that lld is installed and ld64.lld is in PATH.")
 sysroot = $(shell xcrun --show-sdk-path)
 LD = /usr/bin/ld
 REQUIRED_LDFLAGS = -arch $(arch) -e _start -syslibroot $(sysroot) -lSystem
@@ -32,9 +32,6 @@ clean:
 rebuild: clean build
 
 asm-chat-app: obj/main.o
-ifeq ($(nolld),1)
-	@echo "WARNING: If you don't want to link with libSystem, ensure that lld is installed and ld64.lld is in PATH."
-endif
 	$(LD) $(REQUIRED_LDFLAGS) $(LDFLAGS) -o $@ $^
 	$(STRIP) $@
 
