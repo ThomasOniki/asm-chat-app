@@ -321,7 +321,7 @@ usage:
 connect_err_msg:
 	.ascii "connect(2) failed, its error number will be returned.\n"
 econrefused_msg:
-	.ascii "connect(2) failed: ECONREFUSED. Check that a host is running at the specified ip and port.\n"
+	.ascii "connect(2) failed: ECONNREFUSED. Check that a host is running at the specified ip and port.\n"
 bind_err_msg:
 	.ascii "bind(2) failed, its error number will be returned.\n"
 eaddrinuse_msg:
