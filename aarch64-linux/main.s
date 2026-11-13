@@ -111,7 +111,7 @@ client_port_end:
 	mov x8, 203
 	svc 0
 
-	cbnz x0, connect_err
+	cbnz w0, connect_err
 
 	b poll_loop
 
