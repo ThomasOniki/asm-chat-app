@@ -6,7 +6,6 @@ This project is a chat app entirely written in assembly with no dependencies (no
 
 [source,sh]
 ----
-cd <platform>
 make
 ----
 
