@@ -274,7 +274,7 @@ econrefused:
 	mov w0, 2
 	adrp x1, econrefused_msg@page
 	add x1, x1, econrefused_msg@pageoff
-	mov x2, 91
+	mov x2, 92
 	mov x16, 4
 	svc 0x80
 	mov w0, 1
