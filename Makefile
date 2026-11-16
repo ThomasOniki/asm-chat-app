@@ -2,20 +2,20 @@ AS = as
 ASFLAGS =
 LDFLAGS =
 STRIP = strip
-kernel = $(shell uname -s | tr A-Z a-z)
-arch = $(shell uname -m)
-platform = $(arch)-$(kernel)
+KERNEL = $(shell uname -s | tr A-Z a-z)
+ARCH = $(shell uname -m)
+platform = $(ARCH)-$(KERNEL)
 
-ifeq ($(kernel), darwin)
+ifeq ($(KERNEL), darwin)
 lld_path = $(shell command -v ld64.lld)
 ifeq ($(lld_path),)
 $(warning "WARNING: If you don't want to link with libSystem, ensure that lld is installed and ld64.lld is in PATH.")
 sysroot = $(shell xcrun --show-sdk-path)
 LD = /usr/bin/ld
-REQUIRED_LDFLAGS = -arch $(arch) -e _start -syslibroot $(sysroot) -lSystem
+REQUIRED_LDFLAGS = -arch $(ARCH) -e _start -syslibroot $(sysroot) -lSystem
 else
 LD = $(lld_path)
-REQUIRED_LDFLAGS = -arch $(arch) -e _start -platform_version macos 27.2 15.3 
+REQUIRED_LDFLAGS = -arch $(ARCH) -e _start -platform_version macos 27.2 15.3 
 endif
 else
 LD := ld
