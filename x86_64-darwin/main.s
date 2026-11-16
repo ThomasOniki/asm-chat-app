@@ -1,3 +1,22 @@
+SYS_socket  = 0x2000000 + 97
+SYS_connect = 0x2000000 + 98
+SYS_bind    = 0x2000000 + 104
+SYS_listen  = 0x2000000 + 106
+SYS_accept  = 0x2000000 + 30
+SYS_poll    = 0x2000000 + 230
+SYS_read    = 0x2000000 + 3
+SYS_write   = 0x2000000 + 4
+SYS_exit    = 0x2000000 + 1
+
+AF_INET = 2
+SOCK_STREAM = 1
+POLLIN = 1
+
+ECONNREFUSED = 61
+EADDRINUSE = 48
+
+BUF_SIZE = 256
+
 .intel_syntax noprefix
 .section __TEXT,__text
 .globl _start
@@ -12,11 +31,10 @@ _start:
 	mov rbx, [rsi + 8]
 	mov rbp, [rsi + 16]
 
-// socket(AF_INET, SOCK_STREAM, 0)
-	mov edi, 2
-	mov esi, 1
+	mov edi, AF_INET
+	mov esi, SOCK_STREAM
 	xor edx, edx
-	mov eax, 0x2000000 + 97
+	mov eax, SYS_socket
 	syscall
 
 // get ip to edi
@@ -25,7 +43,7 @@ _start:
 
 byte_start:
 	movzx edx, byte ptr[rbx]
-	sub edx, 0x30
+	sub edx, '0'
 	cmp edx, 10
 	jae usage
 	inc rbx
@@ -33,7 +51,7 @@ byte_start:
 
 	movzx edx, byte ptr[rbx]
 	inc rbx
-	sub edx, 0x30
+	sub edx, '0'
 	cmp edx, 10
 	jae byte_end
 	imul esi, 10
@@ -41,7 +59,7 @@ byte_start:
 
 	movzx edx, byte ptr[rbx]
 	inc rbx
-	sub edx, 0x30
+	sub edx, '0'
 	cmp edx, 10
 	jae byte_end
 	imul esi, 10
@@ -49,7 +67,7 @@ byte_start:
 
 	movzx edx, byte ptr[rbx]
 	inc rbx
-	sub edx, 0x30
+	sub edx, '0'
 
 byte_end:
 	cmp esi, 256
@@ -62,19 +80,19 @@ byte_end:
 	dec ecx
 	jecxz ip_end
 
-	cmp edx, -2 // '.' - 0x30
+	cmp edx, '.' - '0'
 	jne usage
 
 	shr edi, 8
 	jmp byte_start
 
 ip_end:
-	cmp edx, -0x30 // '\0' - 0x30
+	cmp edx, 0 - '0'
 	jne usage
 
 // get port to esi
 	movzx edx, byte ptr[rbp]
-	sub edx, 0x30
+	sub edx, '0'
 	cmp edx, 10
 	jae usage
 	inc rbp
@@ -85,7 +103,7 @@ ip_end:
 client_port_digit:
 	movzx edx, byte ptr[rbp]
 	inc rbp
-	sub edx, 0x30
+	sub edx, '0'
 	cmp edx, 10
 	jae client_port_end
 	imul esi, 10
@@ -95,10 +113,10 @@ client_port_digit:
 
 	movzx edx, byte ptr[rbp]
 	inc rbp
-	sub edx, 0x30
+	sub edx, '0'
 
 client_port_end:
-	cmp edx, -0x30
+	cmp edx, -'0'
 	jne usage
 	cmp esi, 0xFFFF
 	ja usage
@@ -111,11 +129,10 @@ client_port_end:
 
 	mov ebx, eax
 
-// connect(sockfd, &sockaddr, socklen)
   mov edi, eax
 	mov rsi, rsp
 	mov edx, 16
-	mov eax, 0x2000000 + 98
+	mov eax, SYS_connect
 	syscall
 
 	cmp eax, 0
@@ -125,16 +142,15 @@ client_port_end:
 
 server:
 	mov rbp, [rsi + 8]
-// socket(AF_INET, SOCK_STREAM, 0)
-	mov edi, 2
-	mov esi, 1
+	mov edi, AF_INET
+	mov esi, SOCK_STREAM
 	xor edx, edx
-	mov eax, 0x2000000 + 97
+	mov eax, SYS_socket
 	syscall
 
 // get port to esi
 	movzx edx, byte ptr[rbp]
-	sub edx, 0x30
+	sub edx, '0'
 	cmp edx, 10
 	jae usage
 	inc rbp
@@ -145,7 +161,7 @@ server:
 server_port_digit:
 	movzx edx, byte ptr[rbp]
 	inc rbp
-	sub edx, 0x30
+	sub edx, '0'
 	cmp edx, 10
 	jae server_port_end
 	imul esi, 10
@@ -155,10 +171,10 @@ server_port_digit:
 
 	movzx edx, byte ptr[rbp]
 	inc rbp
-	sub edx, 0x30
+	sub edx, '0'
 
 server_port_end:
-	cmp edx, -0x30
+	cmp edx, 0 - '0'
 	jne usage
 	cmp esi, 0xFFFF
 	ja usage
@@ -170,46 +186,42 @@ server_port_end:
 	mov qword ptr[rsp + 8], 0
 	mov [rsp + 2], si
 
-// bind(sockfd, &sockaddr, socklen)
 	mov edi, eax
 	mov rsi, rsp
 	mov edx, 16
-	mov eax, 0x2000000 + 104
+	mov eax, SYS_bind
 	syscall
 	cmp eax, 0
 	jne bind_err
 
-// listen(sockfd, backlog)
 	mov edi, ebx
 	mov esi, 10
-	mov eax, 0x2000000 + 106
+	mov eax, SYS_listen
 	syscall
 
-// accept(sockfd, NULL, NULL)
 	mov edi, ebx
 	xor esi, esi
 	xor edx, edx
-	mov eax, 0x2000000 + 30
+	mov eax, SYS_accept
 	syscall
 
 	mov ebx, eax
 
 poll_loop:
-	sub rsp, 0x100 + 16
+	sub rsp, BUF_SIZE + 16
 	mov rbp, rsp
-	add rbp, 0x100
+	add rbp, BUF_SIZE
 
 	mov [rbp], ebx
-	mov word ptr[rbp + 4], 1 // POLLIN
-	mov dword ptr[rbp + 8], 0 // stdin
-	mov word ptr[rbp + 12], 1 // POLLIN
+	mov word ptr[rbp + 4], POLLIN
+	mov dword ptr[rbp + 8], 0
+	mov word ptr[rbp + 12], POLLIN
 
 continue_poll:
-// poll(fds, nfds, timeout)
 	mov rdi, rbp
 	mov esi, 2
 	xor edx, edx
-	mov eax, 0x2000000 + 230
+	mov eax, SYS_poll
 	syscall
 
 	movzx ecx, word ptr[rbp + 6]
@@ -222,107 +234,101 @@ continue_poll:
 	jmp continue_poll
 
 read_sock:
-// read(sockfd, sp, 0x100)
 	mov edi, ebx
 	mov rsi, rsp
-	mov edx, 0x100
-	mov eax, 0x2000000 + 3
+	mov edx, BUF_SIZE
+	mov eax, SYS_read
 	syscall
 
-// write(1, sp, bytes_read)
   mov edi, 1
 	mov rsi, rsp
 	mov edx, eax
-	mov eax, 0x2000000 + 4
+	mov eax, SYS_write
 	syscall
 
 	movzx ecx, word ptr[rsp]
-	cmp ecx, 0x0a71 // "q\n"
+	cmp ecx, 'q' + ('\n' << 8)
 	jne continue_poll
 
-// exit(0)
 	xor edi, edi
-	mov eax, 0x2000000 + 1
+	mov eax, SYS_exit
 	syscall
 
 read_stdin:
-// read(0, sp, 0x100)
 	xor edi, edi
 	mov rsi, rsp
-	mov edx, 0x100
-	mov eax, 0x2000000 + 3
+	mov edx, BUF_SIZE
+	mov eax, SYS_read
 	syscall
 
-// write(sockfd, sp, bytes_read)
 	mov edi, ebx
 	mov rsi, rsp
 	mov edx, eax
-	mov eax, 0x2000000 + 4
+	mov eax, SYS_write
 	syscall
 
 	movzx ecx, word ptr[rsp]
-	cmp ecx, 0x0a71 // "q\n"
+	cmp ecx, 'q' + ('\n' << 8)
 	jne continue_poll
 
-// exit(0)
 	xor edi, edi
-	mov eax, 0x2000000 + 1
+	mov eax, SYS_exit
 	syscall
 
 connect_err:
-	cmp eax, 61
+	cmp eax, ECONNREFUSED
 	je econrefused
 	mov ebx, eax
 	mov edi, 2
 	lea rsi, [rip + connect_err_msg]
 	mov edx, 54
-	mov eax, 0x2000000 + 4
+	mov eax, SYS_write
 	syscall
 	mov edi, ebx
-	mov eax, 0x2000000 + 1
+	mov eax, SYS_exit
 	syscall
 
 econrefused:
 	mov edi, 2
 	lea rsi, [rip + econrefused_msg]
 	mov edx, 92
-	mov eax, 0x2000000 + 4
+	mov eax, SYS_write
 	syscall
 	mov edi, 1
-	mov eax, 0x2000000 + 1
+	mov eax, SYS_exit
 	syscall
 
 bind_err:
-	cmp eax, 48
+	cmp eax, EADDRINUSE
 	je eaddrinuse
 	mov ebx, eax
 	mov edi, 2
 	lea rsi, [rip + bind_err_msg]
 	mov edx, 51
-	mov eax, 0x2000000 + 4
+	mov eax, SYS_write
 	syscall
 	mov edi, ebx
-	mov eax, 0x2000000 + 1
+	mov eax, SYS_exit
 	syscall
 
 eaddrinuse:
 	mov edi, 2
 	lea rsi, [rip + eaddrinuse_msg]
 	mov edx, 85
-	mov eax, 0x2000000 + 4
+	mov eax, SYS_write
 	syscall
 	mov edi, 1
-	mov eax, 0x2000000 + 1
+	mov eax, SYS_exit
 	syscall
 
 usage:
 	mov edi, 2
 	lea rsi, [rip + usage_msg]
 	mov edx, 58
-	mov eax, 0x2000000 + 4
+	mov eax, SYS_write
 	syscall
 	mov edi, 1
-	mov eax, 0x2000000 + 1
+	mov eax, SYS_exit
 	syscall
 
 .section __TEXT,__const
