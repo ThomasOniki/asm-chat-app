@@ -36,7 +36,7 @@ asm-chat-app: obj/main.o
 	$(STRIP) $@
 
 obj/main.o: $(platform)/main.s obj
-	$(AS) $(ASFLAGS) -o $@ -c $<
+	$(AS) $(ASFLAGS) -o $@ $<
 
 obj:
 	mkdir $@
