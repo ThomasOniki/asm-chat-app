@@ -25,8 +25,7 @@ _start:
 	cmp w0, 3
 	b.ne usage
 
-// client:
-
+# client:
 	ldp x19, x20, [x1, 8]
 
 	mov w0, AF_INET
@@ -35,7 +34,7 @@ _start:
 	mov x16, SYS_socket
 	svc 0x80
 
-// get ip to w1
+# get ip to w1
 	mov w1, 0
 	mov w2, 4
 	mov w3, 10
@@ -68,7 +67,7 @@ byte_end:
 	cmp w4, 256
 	b.hs usage
 
-// little endian stuff
+# little endian stuff
 	lsl w4, w4, 24
 	orr w1, w1, w4
 
@@ -85,7 +84,7 @@ ip_end:
 	cmp w5, 0 - '0'
 	b.ne usage
 
-// get port to w2
+# get port to w2
 	ldrb w5, [x20], 1
 	sub w5, w5, '0'
 	cmp w5, 10
@@ -139,7 +138,7 @@ server:
 	mov x16, SYS_socket
 	svc 0x80
 
-// get port to w2
+# get port to w2
 	ldrb w5, [x20], 1
 	sub w5, w5, '0'
 	cmp w5, 10

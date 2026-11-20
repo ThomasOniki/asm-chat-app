@@ -27,8 +27,7 @@ _start:
 	cmp edi, 3
 	jne usage
 
-// client:
-
+# client:
 	mov rbx, [rsp + 16]
 	mov rbp, [rsp + 24]
 
@@ -38,7 +37,7 @@ _start:
 	mov eax, SYS_socket
 	syscall
 
-// get ip to edi
+# get ip to edi
 	xor edi, edi
 	mov ecx, 4
 
@@ -74,7 +73,7 @@ byte_end:
 	cmp esi, 256
 	jae usage
 
-// little endian stuff
+# little endian stuff
 	shl esi, 24
 	or edi, esi
 
@@ -91,7 +90,7 @@ ip_end:
 	cmp edx, 0 - '0'
 	jne usage
 
-// get port to esi
+# get port to esi
 	movzx edx, byte ptr[rbp]
 	sub edx, '0'
 	cmp edx, 10
@@ -149,7 +148,7 @@ server:
 	mov eax, SYS_socket
 	syscall
 
-// get port to esi
+# get port to esi
 	movzx edx, byte ptr[rbp]
 	sub edx, '0'
 	cmp edx, 10
